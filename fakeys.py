@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from key_instructions import make_instructions_dict, key_instruction
 from translations import get_translation_dicts
 import logging
