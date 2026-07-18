@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
+import sys
+
 from key_instructions import make_instructions_dict, key_instruction
 from translations import get_translation_dicts
+from argparse import ArgumentParser
 import logging
 import time
 
@@ -66,12 +69,18 @@ def send_keypress(keypress: bytearray):
         fd.write(keypress_release)
 
 if __name__ == '__main__':
+    parser = ArgumentParser()
+    parser.add_argument("string")
+
+    args = parser.parse_args()
+
+    #TODO: Add checking for superuser, linux os & existance of usb device
+
     se_instructions = make_instructions_dict("./data/KBDSW.xml")
     en_instructions = make_instructions_dict("./data/KBDUSX.xml")
 
-    text = "Hello, world"
 
-    keypresses = make_keypresses(text, se_instructions)
+    keypresses = make_keypresses(args.string, se_instructions)
 
     for keypress in keypresses:
         send_keypress(keypress)
