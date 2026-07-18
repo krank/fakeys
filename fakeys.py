@@ -1,94 +1,76 @@
-from typing import Optional
-from lxml import etree
-from dataclasses import dataclass
+from key_instructions import make_instructions_dict, key_instruction
+from translations import get_translation_dicts
 import logging
+import time
 
-xmlfile: str = "./data/KBDSW.xml"
-logging.basicConfig(level="INFO")
+# logging.basicConfig(level="INFO")
 
-
-@dataclass
-class key_instruction:
-    vk_name: str
-    keycode: str
-    shift: bool
-    altgr: bool
-    followedby: Optional["key_instruction"] | None
+# Preparations
 
 
-xml_text = ""
+scancode_hids, scancode_js = get_translation_dicts("./data/scancode-hid.csv")
+keypress_release = bytes(8)
+
+def make_hidbytearray(instruction: key_instruction):
+    keypress = bytearray(8)
+    keycode = "0x" + instruction.keycode.lower()
+
+    if keycode not in scancode_hids:
+        print(f"{keycode} not found")
+        return None
+
+    hidbyte = scancode_hids[keycode]
+
+    modbyte = 0
+    if instruction.shift:
+        modbyte |= 2
+    if instruction.altgr:
+        modbyte |= 16 | 64
+
+    logging.info(f"hidbyte: {hex(hidbyte)} modbyte: {"{:08b}".format(modbyte)}")
+
+    keypress[0] = modbyte
+    keypress[2] = hidbyte
+
+    return keypress
 
 
-xml_tree = etree.parse(xmlfile)
+def make_keypresses(text: str, instructions: dict[str, key_instruction]):
+    keypresses: list[bytearray] = []
 
-key_instructions: dict[str, key_instruction] = {}
+    for symbol in text:
+        while True:
+            if symbol not in instructions:
+                logging.warning(f"No instructions for [{symbol}]")
+                break
 
-for physical_key_element in xml_tree.findall("PhysicalKeys/PK"):
+            instr = instructions[symbol]
 
-    # Get common info for all results of this physical key
-    if not physical_key_element.get("SC") or not physical_key_element.get("VK"):
-        print("Key lacks SC or VK")
-        continue  # Make sure there's a scancode and a vk
+            keypress = make_hidbytearray(instr)
 
-    scancode = physical_key_element.get("SC") or ""
-    vk_name = physical_key_element.get("VK") or ""
-    text = ""
-    shift = False
-    altgr = False
+            if not keypress:
+                break
 
-    logging.info("Processing " + vk_name)
+            keypresses.append(keypress)
+            if not instr.followedby:
+                break
 
-    # Process base unmodified result
-    base_result = physical_key_element.xpath("Result[not(@With)]")
+            symbol = instr.followedby
+    return keypresses
 
-    if len(base_result) > 0 and base_result[0].get("Text"):
-        text = base_result[0].get("Text")
+def send_keypress(keypress: bytearray):
+    with open('/dev/hidg0', 'rb+') as fd:
+        fd.write(keypress)
+        fd.write(keypress_release)
 
-        instr = key_instruction(
-            vk_name=vk_name,
-            keycode=scancode,
-            shift=shift,
-            altgr=altgr,
-            followedby=None,
-        )
+if __name__ == '__main__':
+    se_instructions = make_instructions_dict("./data/KBDSW.xml")
+    en_instructions = make_instructions_dict("./data/KBDUSX.xml")
 
-        key_instructions[text] = instr
-        logging.info(f" Added {text}")
+    text = "Hello, world"
 
-    # Process modified results
-    modified_results = physical_key_element.xpath("Result[@With]")
-    if len(modified_results) > 0:
-        for modified_result in modified_results:
-            text = modified_result.get("Text")
-            if not text: continue
+    keypresses = make_keypresses(text, se_instructions)
 
-            modifiers = modified_result.get("With")
-            match modifiers:
-                case "VK_SHIFT":
-                    shift = True
-                    altgr = False
-                case "VK_CONTROL VK_MENU":
-                    shift = False
-                    altgr = True
-                case "VK_SHIFT VK_CONTROL VK_MENU":
-                    shift = True
-                    altgr = True
-                case _:
-                    continue
-
-            instr = key_instruction(
-                vk_name=vk_name,
-                keycode=scancode,
-                shift=shift,
-                altgr=altgr,
-                followedby=None,
-            )
-
-            key_instructions[text] = instr
-            logging.info(f" Added {text}")
-
-    # Process DeadKeyTables
-
-for symbol in key_instructions:
-  instr = key_instructions[symbol]
-  print(f"To make '{symbol}' press key {instr.vk_name} ({instr.keycode}) and {"do" if instr.shift else "don't"} press Shift and {"do" if instr.altgr else "don't"} press AltGr")
+    for keypress in keypresses:
+        send_keypress(keypress)
+        time.sleep(0.1)
