@@ -4,6 +4,8 @@ This is meant to be the same kind of thing as [KeyMime](https://github.com/mtlyn
 
 It also uses keyboard layout files from [Keyboard Layout Info](https://kbdlayout.info/) because I am way too lazy to make my own keyboard layouts. Those use ISO scancodes though, so Fakeys translates between scancodes (which describe physical keys) and HID usage codes (which also describe physical keys).
 
+Someone should make a new standard for referencing hardware keys that covers everyone's use case, so we won't need to deal with this translation business.
+
 ## Installation and prep
 
 [Coming soon]
@@ -15,10 +17,21 @@ Currently there's no web api/interface part, just basically a recreation of the 
 sudo ./fakeys.py "Hello, world!"
 ```
 
-### New keyboard layouts
-Download your favorite keyboard layout from [kbdlayout.info](https://kbdlayout.info/), use the "XML for processing" file. Put it in the data folder. Use the default file name (so the US keyboard is KBDUS.xml or KBDUSX.xml if it's the international version).
+Specify a keyboard layout using the --layout option:
 
-Right now that doesn't actually actually do anything but the plan for the future is to allow for specifying keyboard layout as an argument when running fakeys.py.
+```bash
+sudo ./fakeys.py "Hello, world!" --layout USX
+```
+
+The argument is case sensitive, but keyboard layout files (see below) are expected to be in uppercase except for the .xml suffix.
+
+If you try to specify a layout that isn't in the system, you'll get an error.
+
+Right now the default layout is Swedish, because I'm swedish and this is my program. At some point I might add a config file or possibly try to check your OS keyboard layout or something. That sounds like work, though. Again: lazy.
+
+
+### Adding a keyboard layout
+Download your favorite keyboard layout from [kbdlayout.info](https://kbdlayout.info/), use the "XML for processing" file. Put it in the data folder. Use the default file name (so the US keyboard is KBDUS.xml or KBDUSX.xml if it's the international version).
 
 ## References
 - https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf

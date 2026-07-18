@@ -1,4 +1,5 @@
 from lxml import etree
+from pathlib import Path
 import typing
 from dataclasses import dataclass
 import logging
@@ -127,7 +128,12 @@ def process_result_elements(
     return key_instructions
 
 
-def make_instructions_dict(xmlfile: str):
+def read_layout(layoutname: str):
+    xmlfile: Path | None = get_layout_file(layoutname)
+    if not xmlfile:
+        logging.warning("Not a valid layout")
+        return None
+
     xml_tree = etree.parse(xmlfile)
     key_instructions: dict[str, key_instruction] = {}
 
@@ -151,6 +157,36 @@ def make_instructions_dict(xmlfile: str):
             scancode=scancode,
         )
     return key_instructions
+
+
+def get_available_layouts():
+    available_layouts:list[str] = []
+
+    layoutpath = Path("./data/")
+
+    if not layoutpath.is_dir():
+        logging.warning("'./data' directory not found")
+        return available_layouts
+    
+    available_files = layoutpath.glob("KBD*.xml")
+    return [file.stem[3:] for file in available_files]
+
+
+def get_layout_file(layoutname: str):
+    fileref:Path = Path(f"./data/KBD{layoutname.upper()}.xml")
+
+    if not fileref.is_file():
+        logging.warning(f"File {fileref} not found")
+        return None
+    else:
+        return fileref
+        
+
+
+
+    
+    
+
 
 # se_instructions = make_instructions_dict("./data/KBDSW.xml")
 
