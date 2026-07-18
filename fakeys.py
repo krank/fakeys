@@ -75,4 +75,4 @@ if __name__ == '__main__':
 
     for keypress in keypresses:
         send_keypress(keypress)
-        time.sleep(0.1)
+        time.sleep(0.01)

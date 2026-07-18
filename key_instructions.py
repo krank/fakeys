@@ -3,7 +3,7 @@ import typing
 from dataclasses import dataclass
 import logging
 
-logging.basicConfig(level="INFO")
+# logging.basicConfig(level="INFO")
 
 
 @dataclass
