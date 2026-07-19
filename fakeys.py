@@ -7,8 +7,6 @@ import sys
 
 # logging.basicConfig(level="INFO")
 
-#TODO: Next subproject: simple api endpoints for sending strings / keys
-
 if __name__ == '__main__':
     available_layouts:list[str] = get_available_layouts() or []
 
@@ -17,6 +15,10 @@ if __name__ == '__main__':
     parser.add_argument("--layout", default="SW", help="The keyboard layout to use", choices=available_layouts)
 
     args = parser.parse_args()
+
+    # Specific checks:
+    #  - Running as root?
+    #  - Gadget exists?
 
     layout = read_layout(args.layout)
     if not layout:

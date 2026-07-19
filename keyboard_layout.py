@@ -1,10 +1,18 @@
 from lxml import etree
 from pathlib import Path
 import typing
-from dataclasses import dataclass
 import logging
 
+from dataclasses import dataclass
+from log_handlers import CollectHandler
+
+type Layout = dict[str, key_instruction]
+
 # logging.basicConfig(level="INFO")
+
+logger = logging.getLogger(__name__)
+log_collector = CollectHandler()
+logger.addHandler(log_collector)
 
 
 @dataclass
@@ -17,6 +25,29 @@ class key_instruction:
 
     def __str__(self) -> str:
         return f"Press {self.vk_name} ({self.keycode}){" +Shift" if self.shift else ""}{" +AltGr" if self.altgr else ""}{f" and then you press '{self.followedby}'" if self.followedby else ""}"
+
+
+def get_available_layouts():
+    available_layouts: list[str] = []
+
+    layoutpath = Path("./data/")
+
+    if not layoutpath.is_dir():
+        logger.error("'./data' directory not found")
+        return available_layouts
+
+    available_files = layoutpath.glob("KBD*.xml")
+    return [file.stem[3:] for file in available_files]
+
+
+def get_layout_file(layoutname: str):
+    fileref: Path = Path(f"./data/KBD{layoutname.upper()}.xml")
+
+    if not fileref.is_file():
+        logger.error(f"File {fileref} not found")
+        return None
+    else:
+        return fileref
 
 
 def interpret_modifiers(modifiers: str):
@@ -50,7 +81,7 @@ def get_instr_complexity(instr: key_instruction):
 
 def process_result_elements(
     elementlist_results: typing.Any,
-    key_instructions: dict[str, key_instruction],
+    layout: Layout,
     vk_name: str = "",
     scancode: str = "",
     shift: bool = False,
@@ -61,7 +92,7 @@ def process_result_elements(
 
         text = element_result.get("Text")
         elementlist_deadkeytable_results = element_result.xpath("DeadKeyTable/Result")
-        followedby:str | None = None
+        followedby: str | None = None
 
         # ----------------------------------------------------------------------
         # Get & interpret With
@@ -88,15 +119,15 @@ def process_result_elements(
         # DeadKeyTable handling
 
         if elementlist_deadkeytable_results:
-            logging.info("  Found deadtable")
+            logger.info("  Found deadtable")
             process_result_elements(
                 elementlist_results=elementlist_deadkeytable_results,
-                key_instructions=key_instructions,
+                layout=layout,
                 vk_name=vk_name,
                 scancode=scancode,
                 shift=shift,
                 altgr=altgr,
-                is_deadkey_results=True
+                is_deadkey_results=True,
             )
 
         # ----------------------------------------------------------------------
@@ -114,33 +145,35 @@ def process_result_elements(
 
             # If the result text already has an instruction, check if the new one is
             #  simpler
-            if text in key_instructions:
-                current_instr = key_instructions[text]
+            if text in layout:
+                current_instr = layout[text]
                 if get_instr_complexity(instr) >= get_instr_complexity(current_instr):
-                    logging.info(
+                    logger.info(
                         f" Skipping [{text}] because it's not simpler than the current"
                     )
                     continue
 
-            logging.info(f" + [{text}] {instr}")
-            key_instructions[text] = instr
+            logger.info(f" + [{text}] {instr}")
+            layout[text] = instr
 
-    return key_instructions
+    return layout
 
 
 def read_layout(layoutname: str):
+    log_collector.clear()
+
     xmlfile: Path | None = get_layout_file(layoutname)
     if not xmlfile:
-        logging.warning("Not a valid layout")
+        logger.error("Not a valid layout")
         return None
 
     xml_tree = etree.parse(xmlfile)
-    key_instructions: dict[str, key_instruction] = {}
+    layout: Layout = {}
 
     for element_physical_key in xml_tree.xpath("PhysicalKeys/PK"):
         # Get common info for all results of this physical key
         if not element_physical_key.get("SC") or not element_physical_key.get("VK"):
-            logging.info("Key lacks SC or VK")
+            logger.info("Key lacks SC or VK")
             continue  # Make sure there's a scancode and a vk
 
         scancode = element_physical_key.get("SC") or ""
@@ -148,47 +181,12 @@ def read_layout(layoutname: str):
 
         results = element_physical_key.xpath("Result")
 
-        logging.info(f"Processing {vk_name} [{len(results)} results]")
+        logger.info(f"Processing {vk_name} [{len(results)} results]")
 
-        key_instructions = process_result_elements(
+        layout = process_result_elements(
             results,
-            key_instructions=key_instructions,
+            layout=layout,
             vk_name=vk_name,
             scancode=scancode,
         )
-    return key_instructions
-
-
-def get_available_layouts():
-    available_layouts:list[str] = []
-
-    layoutpath = Path("./data/")
-
-    if not layoutpath.is_dir():
-        logging.warning("'./data' directory not found")
-        return available_layouts
-    
-    available_files = layoutpath.glob("KBD*.xml")
-    return [file.stem[3:] for file in available_files]
-
-
-def get_layout_file(layoutname: str):
-    fileref:Path = Path(f"./data/KBD{layoutname.upper()}.xml")
-
-    if not fileref.is_file():
-        logging.warning(f"File {fileref} not found")
-        return None
-    else:
-        return fileref
-        
-
-
-
-    
-    
-
-
-# se_instructions = make_instructions_dict("./data/KBDSW.xml")
-
-# print(len(se_instructions))
-# print(se_instructions["^"])
+    return layout
