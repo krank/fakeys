@@ -11,7 +11,9 @@ Someone should make a new standard for referencing hardware keys that covers eve
 [Coming soon]
 
 ## Usage
-Currently there's no web api/interface part, just basically a recreation of the Rpi-remote-keyboard functionality.
+
+### Commandline
+This part is just basically a recreation of the Rpi-remote-keyboard functionality.
 
 ```bash
 sudo ./fakeys.py "Hello, world!"
@@ -27,11 +29,40 @@ The argument is case sensitive, but keyboard layout files (see below) are expect
 
 If you try to specify a layout that isn't in the system, you'll get an error.
 
-Right now the default layout is Swedish, because I'm swedish and this is my program. At some point I might add a config file or possibly try to check your OS keyboard layout or something. That sounds like work, though. Again: lazy.
+### Server
+Start the server by running ```fakeys_server.py```.
 
+The ```/type_string``` endpoint accepts simple JSON in this format via POST:
+
+```
+{
+  "string": "Hello, world!"
+}
+```
+
+You can specify a keyboard layout:
+
+```
+{
+  "string": "Hello, world!",
+  "layout": "usx"
+}
+```
+
+### Default keyboard layout: Swedish!
+
+Right now the default layout is Swedish, because I'm swedish and this is my program. You can change this in keyboard_layout.py if you want.
+
+At some point I might possibly try to check your OS keyboard layout or something. That sounds like work, though. Again: lazy.
 
 ### Adding a keyboard layout
 Download your favorite keyboard layout from [kbdlayout.info](https://kbdlayout.info/), use the "XML for processing" file. Put it in the data folder. Use the default file name (so the US keyboard is KBDUS.xml or KBDUSX.xml if it's the international version).
+
+## Plans
+- Web interface frontend to make it easier to use the API endpoint
+- Simple, clear and updated instructions for installation & setup
+- Complete interactive keyboard on the frontend; sending keys directly one at a time as they are typed
+- Outside the scope of the project: Find some way to connect to the rpi zero if it cant find any of its pre-programmed wifis. Surely someone's automated this; maybe by making it create its own wifi network so user can connect to it and enter wifi credentials.
 
 ## References
 - https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf

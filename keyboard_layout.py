@@ -2,13 +2,14 @@ from lxml import etree
 from pathlib import Path
 import typing
 import logging
+import sys
 
 from dataclasses import dataclass
 from log_handlers import CollectHandler
 
 type Layout = dict[str, key_instruction]
 
-# logging.basicConfig(level="INFO")
+default_layout = "SW"
 
 logger = logging.getLogger(__name__)
 log_collector = CollectHandler()
@@ -28,16 +29,21 @@ class key_instruction:
 
 
 def get_available_layouts():
-    available_layouts: list[str] = []
 
     layoutpath = Path("./data/")
 
     if not layoutpath.is_dir():
         logger.error("'./data' directory not found")
-        return available_layouts
+        sys.exit()
 
     available_files = layoutpath.glob("KBD*.xml")
-    return [file.stem[3:] for file in available_files]
+    available_layouts = [file.stem[3:] for file in available_files]
+    
+    if len(available_layouts) == 0:
+        logger.error("No keyboard layouts found")
+        sys.exit()
+
+    return available_layouts
 
 
 def get_layout_file(layoutname: str):
