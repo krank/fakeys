@@ -35,7 +35,7 @@ def make_hidbytearray(instruction: key_instruction, translation_dict: dict[str, 
     keycode = "0x" + instruction.keycode.lower()
 
     if keycode not in translation_dict:
-        print(f"{keycode} not found")
+        logger.error(f"{keycode} not found")
         return None
 
     hidbyte:int = translation_dict[keycode]
