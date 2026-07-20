@@ -57,4 +57,4 @@ if __name__ == "__main__":
             layouts[layout_name] = layout_maybe
 
     # --------------------------------------------------------------------------
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)
