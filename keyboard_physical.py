@@ -44,7 +44,8 @@ def make_hidbytearray(instruction: key_instruction, translation_dict: dict[str, 
     if instruction.shift:
         modbyte |= 2
     if instruction.altgr:
-        modbyte |= 16 | 64
+        modbyte |= 64
+        # modbyte |= 16 | 64
 
     logger.info(f"hidbyte: {hex(hidbyte)} modbyte: {"{:08b}".format(modbyte)}")
 
