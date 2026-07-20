@@ -6,6 +6,8 @@ import keyboard_physical
 import sys
 import logging
 
+#TODO: More extensive commenting
+
 # logging.basicConfig(level="INFO")
 
 if __name__ == "__main__":

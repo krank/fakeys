@@ -59,8 +59,10 @@ At some point I might possibly try to check your OS keyboard layout or something
 Download your favorite keyboard layout from [kbdlayout.info](https://kbdlayout.info/), use the "XML for processing" file. Put it in the data folder. Use the default file name (so the US keyboard is KBDUS.xml or KBDUSX.xml if it's the international version).
 
 ## Plans
+### v1.0
 - Web interface frontend to make it easier to use the API endpoint
 - Simple, clear and updated instructions for installation & setup
+### Future
 - Complete interactive keyboard on the frontend; sending keys directly one at a time as they are typed
 - Outside the scope of the project: Find some way to connect to the rpi zero if it cant find any of its pre-programmed wifis. Surely someone's automated this; maybe by making it create its own wifi network so user can connect to it and enter wifi credentials.
 

@@ -2,18 +2,19 @@
 
 import logging
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, render_template, request
 from keyboard_layout import Layout, read_layout, get_available_layouts, default_layout
 import keyboard_physical
 
 app = Flask("Fakeys server")
+layouts: dict[str, Layout] = {}
 
 
 @app.route("/type_string/", methods=["POST"])
 def typestring():
 
     if "string" not in request.json:
-        return "no string specified!", 400  # 400: Bad Request
+        return {"message": "no string specified!"}, 400  # 400: Bad Request
 
     string = request.json["string"]
 
@@ -26,8 +27,8 @@ def typestring():
 
     if layout_name not in layouts:
         return jsonify(
-            ["error", f"No such layout: '{layout_name}'"], 501
-        )  # 501: Not Implemented
+            {"message": f"No such layout: '{layout_name}'"}), 501
+          # 501: Not Implemented
 
     keyboard_physical.type(string, layouts[layout_name])
 
@@ -41,11 +42,11 @@ def typestring():
 
 @app.route("/", methods=["GET"])
 def home():
-    # TODO: Static page that sends string to endpoint via POST
-    return {"data": "Hello, World"}
+    return render_template("index.html")
+    # return {"data": "Hello, World"}
 
 
-layouts: dict[str, Layout] = {}
+
 
 if __name__ == "__main__":
 
