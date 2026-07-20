@@ -32,6 +32,12 @@ If you try to specify a layout that isn't in the system, you'll get an error.
 ### Server
 Start the server by running ```fakeys_server.py```.
 
+#### Web frontend
+Just go to the base URL and you should see a simple web interface with a text field, a button and a log area. I'm sure you can figure it out.
+
+I'll add a keyboard layout selector at some point. For now you'll just have to live with the swedish default =)
+
+#### API endpoint
 The ```/type_string``` endpoint accepts simple JSON in this format via POST:
 
 ```
@@ -60,7 +66,6 @@ Download your favorite keyboard layout from [kbdlayout.info](https://kbdlayout.i
 
 ## Plans
 ### v1.0
-- Web interface frontend to make it easier to use the API endpoint
 - Simple, clear and updated instructions for installation & setup
 ### Future
 - Complete interactive keyboard on the frontend; sending keys directly one at a time as they are typed
