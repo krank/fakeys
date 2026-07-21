@@ -6,7 +6,7 @@ import keyboard_physical
 import sys
 import logging
 
-#TODO: More extensive commenting
+# TODO: More extensive commenting
 
 # logging.basicConfig(level="INFO")
 
@@ -16,6 +16,7 @@ if __name__ == "__main__":
         logging.error("No keyboard layouts found; will exit")
         sys.exit()
 
+    # TODO: Add argument for logging
     parser = ArgumentParser()
     parser.add_argument("string", help="The text to type using the fake keyboard")
     parser.add_argument(
@@ -39,4 +40,6 @@ if __name__ == "__main__":
     if not layout:
         sys.exit()
 
-    keyboard_physical.type(args.string, layout, 0.01)
+    string = bytes(args.string, "utf-8").decode("unicode_escape")
+
+    keyboard_physical.type(string, layout, 0.01)

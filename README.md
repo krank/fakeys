@@ -66,6 +66,7 @@ Download your favorite keyboard layout from [kbdlayout.info](https://kbdlayout.i
 
 ## Plans
 ### v1.0
+- Support for enter, tab, backspace and other control characters / codepoints
 - Simple, clear and updated instructions for installation & setup
 ### Future
 - Complete interactive keyboard on the frontend; sending keys directly one at a time as they are typed

@@ -16,7 +16,7 @@ def typestring():
     if "string" not in request.json:
         return {"message": "no string specified!"}, 400  # 400: Bad Request
 
-    string = request.json["string"]
+    string = bytes(request.json["string"], "utf-8").decode("unicode_escape")
 
     if "layout" in request.json:
         layout_name = request.json["layout"].upper()
