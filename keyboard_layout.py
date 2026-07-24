@@ -97,6 +97,7 @@ def process_result_elements(
     for element_result in elementlist_results:
 
         text = element_result.get("Text")
+        codepoint = element_result.get("TextCodepoints")
         elementlist_deadkeytable_results = element_result.xpath("DeadKeyTable/Result")
         followedby: str | None = None
 
@@ -139,6 +140,9 @@ def process_result_elements(
         # ----------------------------------------------------------------------
         # Text handling
 
+        if codepoint and not text:
+            text = chr(int(codepoint, 16))
+
         if text:
             # Build the instruction
             instr = key_instruction(
@@ -155,12 +159,17 @@ def process_result_elements(
                 current_instr = layout[text]
                 if get_instr_complexity(instr) >= get_instr_complexity(current_instr):
                     logger.info(
-                        f" Skipping [{text}] because it's not simpler than the current"
+                        f" Skipping [{text.encode("unicode_escape")}] because it's not simpler than the current"
                     )
                     continue
 
-            logger.info(f" + [{text}] {instr}")
+            
+            logger.info(f" + [{text.encode("unicode_escape")}] {instr}")
             layout[text] = instr
+
+            # Bit of a hack to make sure return is pressed when we ask for a \n
+            if text == "\r":
+                layout["\n"] = instr
 
     return layout
 

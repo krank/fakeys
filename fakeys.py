@@ -8,8 +8,6 @@ import logging
 
 # TODO: More extensive commenting
 
-# logging.basicConfig(level="INFO")
-
 if __name__ == "__main__":
     available_layouts: list[str] = get_available_layouts() or []
     if len(available_layouts) == 0:
@@ -29,6 +27,11 @@ if __name__ == "__main__":
         help="The keyboard layout to use",
         choices=available_layouts,
     )
+    parser.add_argument(
+        "--debug",
+        default="WARNING",
+        choices=["DEBUG","INFO","WARNING","ERROR","CRITICAL"]
+    )
 
     args = parser.parse_args()
 
@@ -36,10 +39,11 @@ if __name__ == "__main__":
     #  - Running as root?
     #  - Gadget exists?
 
+    logging.basicConfig(level=args.debug)
+
     layout = read_layout(args.layout)
     if not layout:
         sys.exit()
 
     string = bytes(args.string, "utf-8").decode("unicode_escape")
-
     keyboard_physical.type(string, layout, 0.01)
