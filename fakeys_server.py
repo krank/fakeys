@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 import logging
-
 from flask import Flask, jsonify, render_template, request
 from keyboard_layout import Layout, read_layout, get_available_layouts, default_layout
 import keyboard_physical
+from argparse import ArgumentParser
 
 app = Flask("Fakeys server")
 layouts: dict[str, Layout] = {}
@@ -49,6 +49,11 @@ def home():
 
 
 if __name__ == "__main__":
+    parser = ArgumentParser()
+
+    parser.add_argument("--debug", action="store_true", default=False)
+
+    args = parser.parse_args()
 
     # Prep keyboard layouts
     for layout_name in get_available_layouts():
@@ -57,4 +62,4 @@ if __name__ == "__main__":
             layouts[layout_name] = layout_maybe
 
     # --------------------------------------------------------------------------
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", debug=args.debug)
