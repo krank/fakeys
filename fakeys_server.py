@@ -35,14 +35,14 @@ def typestring():
     # Error handling & return value evaluation
     errors = keyboard_physical.log_collector.get_records_dicts(logging.WARNING)
     if len(errors) > 0:
-        return jsonify({"message": f"Failed to type {string}", "errors": errors}), 500
+        return jsonify({"message": f"Failed to type {string} [{layout_name}]", "errors": errors}), 500
 
-    return jsonify({"message": f"Successfully typed {string}"})
+    return jsonify({"message": f"Successfully typed {string} [{layout_name}]"})
 
 
 @app.route("/", methods=["GET"])
 def home():
-    return render_template("index.html")
+    return render_template("index.html", layouts=list(layouts.keys()))
 
 if __name__ == "__main__":
     parser = ArgumentParser()
