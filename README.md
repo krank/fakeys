@@ -12,6 +12,11 @@ Someone should make a new standard for referencing hardware keys that covers eve
 
 ## Usage
 
+### Supported text
+Pretty much any text supported by the selected keyboard layout should work.
+
+For special characters like ENTER and TAB, use the standard escape sequences like \n and \t.
+
 ### Commandline
 This part is just basically a recreation of the Rpi-remote-keyboard functionality.
 
@@ -66,7 +71,7 @@ Download your favorite keyboard layout from [kbdlayout.info](https://kbdlayout.i
 
 ## Plans
 ### v1.0
-- Support for enter, tab, backspace and other control characters / codepoints
+- Keyboard layout selection for web frontend
 - Simple, clear and updated instructions for installation & setup
 ### Future
 - Complete interactive keyboard on the frontend; sending keys directly one at a time as they are typed

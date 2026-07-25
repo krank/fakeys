@@ -14,7 +14,6 @@ if __name__ == "__main__":
         logging.error("No keyboard layouts found; will exit")
         sys.exit()
 
-    # TODO: Add argument for logging
     parser = ArgumentParser()
     parser.add_argument("string", help="The text to type using the fake keyboard")
     parser.add_argument(

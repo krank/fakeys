@@ -43,10 +43,6 @@ def typestring():
 @app.route("/", methods=["GET"])
 def home():
     return render_template("index.html")
-    # return {"data": "Hello, World"}
-
-
-
 
 if __name__ == "__main__":
     parser = ArgumentParser()

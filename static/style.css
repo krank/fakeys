@@ -33,26 +33,41 @@ main {
 }
 
 main form {
-  background-color: hotpink;
+  background-color: #fff;
   display: flex;
+  border: 2px solid #bbbbbb;
 }
 
 main input[type=text] {
   flex-grow: 1;
   font-size: 2rem;
-  border: 2px solid #bbbbbb;
-  border-right: none;
   padding: .5rem;
+  border: none;
 }
 
 main input[type=submit] {
   background-color: #DEDEDE;
   border: none;
   padding: 0 3rem;
-  border: 2px solid #bbbbbb;
-  border-left: none;
   font-size: 1.5rem;
   text-transform: uppercase;
+}
+
+main select {
+  background-color: #EDEDED;
+  background-color: #fff;
+  font-size: 1.1rem;
+  padding-left: .5rem;
+  margin-right: .5rem;
+  border: none;
+}
+
+main label {
+  background-color: #EDEDED;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 .5rem;
 }
 
 main input[type=submit]:hover {
