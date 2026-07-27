@@ -8,7 +8,43 @@ Someone should make a new standard for referencing hardware keys that covers eve
 
 ## Installation and prep
 
-[Coming soon]
+This is primarily for use with a Raspberry Pi Zero W 1.3, and that's the only device I've tested it on.
+
+I use a normal Raspbian Lite setup; I find the [Raspberry Pi Imager](https://www.raspberrypi.com/software/) to be the easiest way to get started. I usually keep it headless, with a pre-setup wireless connection and SSH.
+
+When you're in the raspbian install, just clone this repo to the device.
+
+### DWC2 & Libcomposite
+
+DWC2 is a driver that allows the Raspberry Pi to act as a USB host. LibComposite lets it present itself as a composite device, for example a keyboard =)
+
+1. Add ```dtoverlay=dwc2``` to the /boot/firmware/config.txt file, under the ```[all]``` heading.
+   - This is the same file that used to be /boot/config.txt
+2. Create a .conf file in the /etc/modules-load.d folder. Name doesn't matter, I usually go with "usbstuff.conf". The contents should just be ```dwc2``` on the first line and ```libcomposite``` on the second.
+
+### Python libs
+
+Run ```pip -r requirements.txt``` to install the python libraries needed.
+
+Or you can just add them manually; ```pip install lxml flask```.
+
+### Device config & activation
+
+The file ```gadgetsetup.sh``` in this repo sets up the keyboard. Just run it =). With sudo!
+
+I borrowed it wholesale from [Rpi-remote-keyboard](https://github.com/n0rc/rpi-remote-keyboard); I just removed one line (the modprobe of libcomposite).
+
+I might do a simple rewrite of it into Python at some point. For now, it… works, and that's the important thing.
+
+### Autostarting the server
+
+If you want the fakeys server to start automatically on boot, add its absolute path to the file /etc/local.d; so for example:
+
+```/home/myusername/fakeys/fakeys_server.py```
+
+### Auto-connecting to new networks
+
+Way, way outside the scope of this project. Stick to the networks you know =)
 
 ## Usage
 
@@ -35,10 +71,10 @@ The argument is case sensitive, but keyboard layout files (see below) are expect
 If you try to specify a layout that isn't in the system, you'll get an error.
 
 ### Server
-Start the server by running ```fakeys_server.py```.
+Start the server by running ```sudo fakeys_server.py```.
 
 #### Web frontend
-Just go to the base URL and you should see a simple web interface with a text field, a button and a log area. I'm sure you can figure it out.
+Just go to the base URL (your rpi host name/ip, port 5000, so for instance "http://fakeys:5000") and you should see a simple web interface with a text field, a dropdown, a button and a log area. I'm sure you can figure it out.
 
 I'll add a keyboard layout selector at some point. For now you'll just have to live with the swedish default =)
 
@@ -71,11 +107,9 @@ Download your favorite keyboard layout from [kbdlayout.info](https://kbdlayout.i
 
 ## Plans
 ### v1.0
-- Keyboard layout selection for web frontend
 - Simple, clear and updated instructions for installation & setup
 ### Future
 - Complete interactive keyboard on the frontend; sending keys directly one at a time as they are typed
-- Outside the scope of the project: Find some way to connect to the rpi zero if it cant find any of its pre-programmed wifis. Surely someone's automated this; maybe by making it create its own wifi network so user can connect to it and enter wifi credentials.
 
 ## References
 - https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf
