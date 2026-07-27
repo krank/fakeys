@@ -12,7 +12,11 @@ This is primarily for use with a Raspberry Pi Zero W 1.3, and that's the only de
 
 I use a normal Raspbian Lite setup; I find the [Raspberry Pi Imager](https://www.raspberrypi.com/software/) to be the easiest way to get started. I usually keep it headless, with a pre-setup wireless connection and SSH.
 
-When you're in the raspbian install, just clone this repo to the device.
+Connect using the **data** port of the Pi, and connect it to the computer you want it to act as a keyboard for.
+
+Install git and some python libs: ```sudo apt-get install git python3-lxml python3-flask```
+
+Then clone this repo to the device.
 
 ### DWC2 & Libcomposite
 
@@ -21,26 +25,17 @@ DWC2 is a driver that allows the Raspberry Pi to act as a USB host. LibComposite
 1. Add ```dtoverlay=dwc2``` to the /boot/firmware/config.txt file, under the ```[all]``` heading.
    - This is the same file that used to be /boot/config.txt
 2. Create a .conf file in the /etc/modules-load.d folder. Name doesn't matter, I usually go with "usbstuff.conf". The contents should just be ```dwc2``` on the first line and ```libcomposite``` on the second.
-
-### Python libs
-
-Run ```pip -r requirements.txt``` to install the python libraries needed.
-
-Or you can just add them manually; ```pip install lxml flask```.
+3. Reboot the device.
 
 ### Device config & activation
 
-The file ```gadgetsetup.sh``` in this repo sets up the keyboard. Just run it =). With sudo!
+The file ```gadgetsetup.sh``` in this repo sets up the keyboard. Add its absolute path to the file /etc/local.d; so for example:
+
+```/home/myusername/fakeys/gadgetsetup.sh```
 
 I borrowed it wholesale from [Rpi-remote-keyboard](https://github.com/n0rc/rpi-remote-keyboard); I just removed one line (the modprobe of libcomposite).
 
 I might do a simple rewrite of it into Python at some point. For now, it… works, and that's the important thing.
-
-### Autostarting the server
-
-If you want the fakeys server to start automatically on boot, add its absolute path to the file /etc/local.d; so for example:
-
-```/home/myusername/fakeys/fakeys_server.py```
 
 ### Auto-connecting to new networks
 
